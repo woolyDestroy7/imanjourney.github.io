@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prayers Time</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+    }
+
+    .prayer-box {
+      background-color: rgb(29, 205, 52);
+      border: 1px solid #000000;
+      border-radius: 30px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+      box-shadow: rgba(128, 128, 128, 0.117) 0 0 0 5px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .clock {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-family: 'Arial Narrow Bold';
+    }
+
+    .prayer-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .prayer-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .prayer-name {
+      font-weight: bold;
+    }
+
+    .prayer-time {
+      color: #2b2828;
+    }
+  </style>
+</head>
+<body>
+  <div class="prayer-box">
+    <h1>Prayers</h1>
+    <div class="clock">
+      <span id="clockTime"></span>
+    </div>
+    <ul class="prayer-list">
+      <li>
+        <span class="prayer-name">Fajr</span>
+        <span class="prayer-time" id="fajrTime"></span>
+      </li>
+      <li>
+        <span class="prayer-name">Dhuhr</span>
+        <span class="prayer-time" id="dhuhrTime"></span>
+      </li>
+      <li>
+        <span class="prayer-name">Asr</span>
+        <span class="prayer-time" id="asrTime"></span>
+      </li>
+      <li>
+        <span class="prayer-name">Maghrib</span>
+        <span class="prayer-time" id="maghribTime"></span>
+      </li>
+      <li>
+        <span class="prayer-name">Isha</span>
+        <span class="prayer-time" id="ishaTime"></span>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    // Update the clock time
+    function updateClock() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var ampm = hours >= 12 ? 'PM' : 'AM';
+
+      // Convert to 12-hour format
+      hours = hours % 12 || 12;
+
+      // Format the time to add leading zeros if needed
+      var formattedTime = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + ' ' + ampm;
+
+      document.getElementById('clockTime').textContent = formattedTime;
+    }
+
+    // Fetch prayer times from the API
+    function fetchPrayerTimes(latitude, longitude) {
+      var apiEndpoint = 'https://api.collectapi.com/pray/all?data.city=cairo'; // Replace with your actual API endpoint
+
+      fetch(apiEndpoint)
+        .then(response => response.json())
+        .then(data => {
+          var prayerTimes = data.prayerTimes;
+
+          // Update the prayer times on the page
+          document.getElementById('fajrTime').textContent = prayerTimes.fajr;
+          document.getElementById('dhuhrTime').textContent = prayerTimes.dhuhr;
+          document.getElementById('asrTime').textContent = prayerTimes.asr;
+          document.getElementById('maghribTime').textContent = prayerTimes.maghrib;
+          document.getElementById('ishaTime').textContent = prayerTimes.isha;
+        })
+        .catch(error => {
+          console.error('Error fetching prayer times:', error);
+        });
+    }
+
+    // Get the user's location and fetch prayer times
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            fetchPrayerTimes(latitude, longitude);
+          },
+          error => {
+            console.error('Error getting geolocation:', error);
+          }
+        );
+      } else {
+        console.error('Geolocation is not supported by this browser.');
+      }
+    }
+
+    // Update the clock every second
+    setInterval(updateClock, 1000);
+
+    // Get the location and prayer times when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      getLocation();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+       "status": "success",
+       "result": {
+         "prayerTimes": {
+           "fajr": "5:30 AM",
+           "dhuhr": "12:30 PM",
+           "asr": "4:00 PM",
+           "maghrib": "7:30 PM",
+           "isha": "9:00 PM"
+         }
+       }
+ }

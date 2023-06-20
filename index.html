@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ImanJourney</title>
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .navbar {
+      height: 20px;
+      background-color: rgb(29, 205, 52);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+
+    .logo {
+      margin: 0;
+    }
+
+    .nav-icons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-icons {
+      list-style-type: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: white;
+    }
+
+    .nav-icon img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .auth-buttons {
+      display: flex;
+      align-items: center;
+    }
+
+    .auth-button {
+      margin: 0 10px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 20px;
+      background-color: white;
+      color: rgb(29, 205, 52);
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .content {
+      padding: 20px;
+      text-align: center;
+      color: white;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    #surahSearch {
+      width: 400px;
+      padding: 15px;
+      border-radius: 30px;
+      font-size: 20px;
+      border: none;
+      outline: none;
+      box-shadow: 0 2px 5px rgba(51, 50, 50, 0.262);
+    }
+
+    #surahSearch::placeholder {
+      color: #ccc;
+    }
+
+    #surahList {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #surahList li {
+      padding: 5px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    #surahList li:hover {
+      background-color: #e9e9e9;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <h1 class="logo">Quran App</h1>
+    <div class="nav-icons-container">
+      <ul class="nav-icons">
+        <li class="nav-icon">
+          <a href="prayers.html">
+            <img src="prayers-icon.png" alt="Prayers Icon">
+          </a>
+        </li>
+        <li class="nav-icon">
+          <a href="stories.html">
+            <img src="stories-icon.png" alt="Stories Icon">
+          </a>
+        </li>
+      </ul>
+      <div class="auth-buttons">
+        <button class="auth-button" id="signOutButton">Sign Out</button>
+        <a class="auth-button" href="signin.html" id="signInButton">Sign In</a>
+        <a class="auth-button" href="signup.html" id="signUpButton">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+    <h2>Search for Surah</h2>
+    <div class="search-container">
+      <input type="text" id="surahSearch" placeholder="Enter Surah name">
+    </div>
+    <ul id="surahList"></ul>
+  </div>
+
+  <script>
+    fetch('surahs.json')
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.surahs && Array.isArray(data.surahs)) {
+          // Process the surahs data and generate the list dynamically
+          var surahs = data.surahs;
+          var surahList = document.getElementById('surahList');
+
+          function generateSurahList(surahs) {
+            surahList.innerHTML = '';
+            surahs.forEach(function(surah) {
+              var surahItem = document.createElement('li');
+              surahItem.textContent = surah.number + '. ' + surah.name;
+              surahList.appendChild(surahItem);
+            });
+          }
+
+          generateSurahList(surahs);
+
+          // Search functionality
+          var searchInput = document.getElementById('surahSearch');
+          searchInput.addEventListener('input', function() {
+            var searchQuery = this.value.toLowerCase();
+            var filteredSurahs = surahs.filter(function(surah) {
+              return surah.name.toLowerCase().includes(searchQuery);
+            });
+            generateSurahList(filteredSurahs);
+          });
+        } else {
+          console.error('Invalid surahs data:', data);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading surahs:', error);
+      });
+
+    function signOut() {
+      // Clear session storage
+      sessionStorage.clear();
+
+      // Remove user tokens or perform other necessary sign-out actions
+
+      // Display sign-out alert message
+      alert("You have been signed out.");
+
+      // Redirect to sign-in page
+      window.location.href = "signin.html";
+    }
+
+    // Add event listener to the sign-out button
+    var signOutButton = document.getElementById("signOutButton");
+    signOutButton.addEventListener("click", signOut);
+
+    // Check if the user is signed in
+    var isSignedUp = sessionStorage.getItem("isSignedUp");
+
+    if (isSignedUp === "true") {
+      // User is signed in
+      var signInButton = document.getElementById("signInButton");
+      var signUpButton = document.getElementById("signUpButton");
+
+      signInButton.display = "none";
+      signUpButton.display = "none";
+    }
+  </script>
+</body>
+</html>
